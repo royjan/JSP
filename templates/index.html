@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SearchBar</title>
+    <link href="{{ url_for('static', filename='jquery.flexdatalist.min.css')}}" rel="stylesheet" type="text/css">
+    <link href="{{ url_for('static', filename='semantic.rtl.min.css')}}" rel="stylesheet" type="text/css"> <!-- 2.4.1 -->
+    <script src="{{ url_for('static', filename='jquery.min.js')}}"></script> <!-- 3.4.1 -->
+    <script src="{{ url_for('static', filename='jquery.flexdatalist.min.js')}}"></script> <!-- 2.2.4 -->
+    <script src="{{ url_for('static', filename='index.js')}}"></script>
+
+</head>
+<body style="direction: rtl;">
+<form method="post" id="myform" action="search_part">
+    <div class="ui form">
+
+        <div class="ui">
+            <label>שם הפריט\קיט</label>
+            <i class="search icon"></i>
+            <input type="text" class="flexdatalist" placeholder="מחפש..."
+                   style="direction: rtl;" id="part_name" name="part_name" list="parts-names" multiple='multiple'
+                   data-selection-required='1' data-min-length="2"/>
+        </div>
+
+        <datalist id="parts-names">
+            {% for part in parts %}
+            <option class="right aligned segment">{{part}}</option>
+            {% endfor %}
+        </datalist>
+
+        <div class="ui">
+            <label>מס שלדה</label>
+            <i class="search icon"></i>
+            <input type="text" style="text-transform: uppercase;" class="flexdatalist" placeholder="מחפש..."
+                   name="vin" id="vin" list="vins" value="{{vin}}" onkeyup="this.value = this.value.toUpperCase();"/>
+        </div>
+
+        <datalist id="vins">
+            {% for vin in vins %}
+            <option class="right aligned segment">{{vin}}</option>
+            {% endfor %}
+        </datalist>
+
+
+        <div class="ui">
+            <label>מס רישוי</label>
+            <i class="search icon"></i>
+            <input type="text" style="text-transform: uppercase;" class="flexdatalist" placeholder="מחפש..."
+                   name="license_plate" id="license_plate" list="license_plates" value="{{license_plate}}"
+                   onkeyup="this.value = this.value.toUpperCase();"/>
+        </div>
+
+
+        <datalist id="license_plates">
+            {% for license_plate in license_plates %}
+            <option class="right aligned segment">{{license_plate}}</option>
+            {% endfor %}
+        </datalist>
+        {% if part_numbers %}}
+        {% set items = part_numbers.split('|') %}
+        <div class="ui field">
+            <label>רשימת פריטים</label>
+            <div class="ui segments">
+                {%for item in items%}
+                <div class="ui segment">
+                    {{item|safe}}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        <button type="button" class="ui button" id="myBtn" onclick="myFunction()">שלח</button>
+    </div>
+</form>
+<script>
+
+</script>
+<p></p>
+</body>
+</html>

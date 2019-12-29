@@ -1,0 +1,7 @@
+flask
+pandas
+dictalchemy
+selenium
+sqlalchemy
+psycopg2-binary
+clipboard
