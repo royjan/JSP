@@ -70,7 +70,7 @@ def search_part():
         code=307)  # 307 = post
 
 
-@app.route('/search_mkt')
+@app.route('/search_mkt', methods=['POST'])
 def search_mkt():
     name = request.args['mkt']
     search_item(driver, name)

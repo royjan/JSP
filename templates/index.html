@@ -11,11 +11,12 @@
 
 </head>
 <body style="direction: rtl;">
+
 <form method="post" id="myform" action="search_part">
     <div class="ui form">
 
         <div class="ui">
-            <label>שם הפריט\קיט</label>
+            <label for="part_name">שם הפריט\קיט</label>
             <i class="search icon"></i>
             <input type="text" class="flexdatalist" placeholder="מחפש..."
                    style="direction: rtl;" id="part_name" name="part_name" list="parts-names" multiple='multiple'
@@ -29,7 +30,7 @@
         </datalist>
 
         <div class="ui">
-            <label>מס שלדה</label>
+            <label for="vin">מס שלדה</label>
             <i class="search icon"></i>
             <input type="text" style="text-transform: uppercase;" class="flexdatalist" placeholder="מחפש..."
                    name="vin" id="vin" list="vins" value="{{vin}}" onkeyup="this.value = this.value.toUpperCase();"/>
@@ -43,7 +44,7 @@
 
 
         <div class="ui">
-            <label>מס רישוי</label>
+            <label for="license_plate">מס רישוי</label>
             <i class="search icon"></i>
             <input type="text" style="text-transform: uppercase;" class="flexdatalist" placeholder="מחפש..."
                    name="license_plate" id="license_plate" list="license_plates" value="{{license_plate}}"
@@ -72,9 +73,15 @@
         <button type="button" class="ui button" id="myBtn" onclick="myFunction()">שלח</button>
     </div>
 </form>
-<script>
-
-</script>
-<p></p>
+<form method="post" id="specificform" action="search_mkt">
+    <div class="ui form">
+        <div class="ui">
+            <label for="mkt">שם הפריט\קיט</label>
+            <i class="search icon"></i>
+            <input type="text" placeholder="מחפש..." style="direction: rtl;" id="mkt" name="mkt"  multiple='multiple'/>
+        </div>
+        <button type="button" class="ui button" id="mktBtn" onclick="">שלח</button>
+    </div>
+</form>
 </body>
 </html>
