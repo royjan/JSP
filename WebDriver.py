@@ -16,6 +16,7 @@ def singleton(class_):
 
     return get_instance
 
+
 @singleton
 class Driver:
 
@@ -28,9 +29,12 @@ class Driver:
     def login(self, user: User):
         import time
         while not user.connected:
-            self._driver.get(f"https://{user.name}:{user.password}@servicebox.peugeot.com/pages/frames/loadPage.jsp")
-            self._driver.find_element_by_xpath('//*[@id="userid"]').send_keys(user.name)
-            self._driver.find_element_by_xpath('//*[@id="password"]').send_keys(user.password)
+            config = User.get_user_details()
+            user_name, password = config['USER_NAME'], config['PASSWORD']
+            self._driver.get(f"https://{user_name}:{password}@servicebox.peugeot.com/pages/frames"
+                             f"/loadPage.jsp")
+            self._driver.find_element_by_xpath('//*[@id="userid"]').send_keys(user_name)
+            self._driver.find_element_by_xpath('//*[@id="password"]').send_keys(password)
             self._driver.get("https://servicebox.peugeot.com/do/parametrer")
             self._driver.find_element_by_xpath('//*[@id="menuTools"]/li[5]/a').click()
             time.sleep(7)
@@ -121,7 +125,7 @@ class Driver:
             f'{capitalize(part.section)}').click()  # white background links with brown titles
         self._driver.implicitly_wait(3)
         self._driver.find_element_by_xpath(
-            f'//*[@id="divTabDoc"]//li/a[contains(text(),"{capitalize(part.bsquare)}")]').click()  # blue background
+            f'//*[@id="divTabDoc"]//li/a[contains(text(),"Parts")]').click()  # blue background
         self._driver.find_element_by_xpath(
             f'/html/body/div[4]/div[3]/div[3]/table/tbody/tr[3]/td/div[3]/div[2]/table/tbody//td[contains(text(), '
             f'"{part.line.upper()}")]').click()

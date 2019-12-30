@@ -2,6 +2,7 @@ from Log import logger
 
 MAX_LENGTH_PER_WORD = 15
 IMAGES_FOLDER = 'images'
+USER_FILE = 'ConnectionDetails.txt'
 
 
 def add_to_clipboard(text: str):
