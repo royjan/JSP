@@ -1,6 +1,6 @@
 class User:
     name = "da87217"
-    password = "kb2851ru"
+    password = "kb2852ru"
 
     def __init__(self):
         self._is_login = False
