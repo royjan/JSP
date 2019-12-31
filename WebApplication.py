@@ -72,8 +72,9 @@ def search_part():
 
 @app.route('/search_mkt', methods=['POST'])
 def search_mkt():
-    name = request.args['mkt']
+    name = request.form['mkt']
     search_item(driver, name)
+    return redirect(url_for('index'), code=302)
 
 
 if __name__ == '__main__':
