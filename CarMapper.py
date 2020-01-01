@@ -42,7 +42,7 @@ class CarMapper(Base):
         db_car = None
         if self.vin:                                                            # try to get car by vin
             db_car = CarMapper.get_car_by_vin(self.vin)
-            if not self.license_plate:                                          # if not has license plate
+            if not self.license_plate and db_car:                               # if not has license plate
                 self.license_plate = db_car.license_plate
                 return
         elif self.license_plate and not self.vin:                               # try to get car by license plate
