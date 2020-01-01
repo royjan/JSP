@@ -30,6 +30,9 @@ class Part(Base):
         self.bsquare = 'Parts'
         self.name = name
 
+    def to_dict(self):
+        return self.__dict__
+
     @classmethod
     def get_part_by_name(cls, name: str) -> list:
         parts = []
@@ -44,6 +47,14 @@ class Part(Base):
         # cls.db_session.rollback()
         lst = cls.db_session.query(cls.name).all()
         return {item.name for item in lst}
+
+    @staticmethod
+    def sort_parts_by_sections(parts):
+        from collections import defaultdict
+        dic = defaultdict(list)
+        for part in parts:
+            dic[part.cat, part.section, part.bsquare, part.line].append(part)
+        return dic
 
 
 if __name__ == '__main__':

@@ -16,6 +16,7 @@ def singleton(class_):
 
     return get_instance
 
+
 @singleton
 class Driver:
 
@@ -48,7 +49,8 @@ class Driver:
 
         car_name = self.get_car_name()
         CarMapper.name_car_by_vin(car, car_name)
-        part_numbers = self.over_every_parts(parts, car_name)
+        parts_sorted = Part.sort_parts_by_sections(parts)
+        part_numbers = self.over_every_parts(parts_sorted, car_name)
         return part_numbers, car.license_plate, car.vin
 
     def take_screen_shot(self, part_mapper: PartMapper):
@@ -144,21 +146,22 @@ class Driver:
             parts.append(f'{part_name} : {part_number} <a target=_blank href={path}>תמונה</a>')
         return "|".join(parts)
 
-    def over_every_parts(self, parts, car_name):
+    def over_every_parts(self, sorted_parts, car_name):
         part_maps = {}
         parts_images = []
-        for part in parts:
+        for key in sorted_parts.keys():  # key = entire section
             self.close_other_windows()
-            self.go_to_part(part)
-            part_number = self.copy_part_number(part, car_name)
-            part_mapper = PartMapper(part.name, car_name, part_number)
-            if part_number != "NotAValue":
-                PartMapper.add_part(part_mapper)
-                image_path = self.take_screen_shot(part_mapper)
-            else:
-                image_path = ""
-            part_maps[part.name] = part_number
-            parts_images.append(image_path)
+            self.go_to_part(sorted_parts[key][0])
+            for part in sorted_parts[key]:
+                part_number = self.copy_part_number(part, car_name)
+                part_mapper = PartMapper(part.name, car_name, part_number)
+                if part_number != "NotAValue":
+                    PartMapper.add_part(part_mapper)
+                    image_path = self.take_screen_shot(part_mapper)
+                else:
+                    image_path = ""
+                part_maps[part.name] = part_number
+                parts_images.append(image_path)
         part_number = self.build_string_from_dict(part_maps, parts_images)
         return part_number
 
