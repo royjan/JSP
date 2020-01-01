@@ -16,7 +16,7 @@ def singleton(class_):
 
     return get_instance
 
-@singleton
+
 class Driver:
 
     def __init__(self):
