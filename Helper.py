@@ -2,6 +2,7 @@ from Log import logger
 
 MAX_LENGTH_PER_WORD = 15
 IMAGES_FOLDER = 'images'
+NUMBER_OF_RETRIES_FOR_CHANGE_LANGUAGE = 2
 
 
 def add_to_clipboard(text: str):
