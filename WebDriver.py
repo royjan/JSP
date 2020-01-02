@@ -1,3 +1,4 @@
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver import Chrome
 from Helper import *
 from Part import Part
@@ -27,18 +28,24 @@ class Driver:
 
     def login(self, user: User):
         import time
-        while not user.connected:
-            self._driver.get(f"https://{user.name}:{user.password}@servicebox.peugeot.com/pages/frames/loadPage.jsp")
+        self._driver.get(f"https://{user.name}:{user.password}@servicebox.peugeot.com/pages/frames/loadPage.jsp")
+        try:
             self._driver.find_element_by_xpath('//*[@id="userid"]').send_keys(user.name)
             self._driver.find_element_by_xpath('//*[@id="password"]').send_keys(user.password)
-            self._driver.get("https://servicebox.peugeot.com/do/parametrer")
-            self._driver.find_element_by_xpath('//*[@id="menuTools"]/li[5]/a').click()
-            time.sleep(7)
-            self._driver.find_element_by_xpath('//*[@id="langue"]//option[@value="en_GB"]').click()
-            time.sleep(7)
-            self._driver.find_element_by_xpath('//*[@id="global"]/div/form[1]/table/tbody/tr[6]/td/input').click()
-            user.connected = True
-        self.home_page()
+            for _ in range(NUMBER_OF_RETRIES_FOR_CHANGE_LANGUAGE):
+                self._driver.get("https://servicebox.peugeot.com/do/parametrer")
+                self._driver.find_element_by_xpath('//*[@id="menuTools"]/li[5]/a').click()
+                time.sleep(7)
+                self._driver.find_element_by_xpath('//*[@id="langue"]//option[@value="en_GB"]').click()
+                time.sleep(7)
+                self._driver.find_element_by_xpath('//*[@id="global"]/div/form[1]/table/tbody/tr[6]/td/input').click()
+                if self._driver.find_element_by_xpath('//*[@id="menuTools"]/li[5]/a').text == 'My Profile':
+                    user.connected = True
+                    self.home_page()
+                    break
+        except NoSuchElementException:
+            logger.exception("User name or password are wrong!")
+            raise NoSuchElementException("User name or password are wrong!")
 
     def show_popup_with_explanation(self, parts: [Part], car: CarMapper):
         self.close_other_windows()
