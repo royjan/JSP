@@ -1,17 +1,17 @@
-// //vin = vin
-// //plate = plate
-// if (confirm('Are you sure you want to override this vin ' + vin + ' with plate ' + plate + ' ?' )) {
-//     //True
-// } else {
-//     //False
-// }
-
-
 $('.flexdatalist').flexdatalist({
     minLength: 2
 });
 
-
+function MyOption() {
+    let value = $('#search-box').val();
+    if (value === 'mkt') {
+        $('#mktform').show();
+        $('#itemsform').hide();
+    } else {
+        $('#mktform').hide();
+        $('#itemsform').show();
+    }
+}
 
 function safeParse(data) {
     try {
@@ -25,13 +25,17 @@ function safeParse(data) {
 
 jQuery.ajaxSetup({async: false});
 
-function myFunction() {
+function submitMkt() {
+    document.getElementById("mktform").submit();
+}
+
+function submitItems() {
     let vin = document.getElementById('vin').value;
     let license_plate = document.getElementById('license_plate').value;
     let parts_name = document.getElementById('part_name').value;
     let parts = document.getElementById('part_name').value.split(",");
     parts = parts.filter(value => value.startsWith("קיט"));
-    for (let index =0; index < parts.length; index++) {
+    for (let index = 0; index < parts.length; index++) {
         let data = $.ajax({
             async: false,
             type: 'GET',
@@ -80,5 +84,6 @@ function myFunction() {
             }
         }
     }
-    document.getElementById("myform").submit();
+    document.getElementById("itemsform").submit();
 }
+

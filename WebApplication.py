@@ -74,11 +74,11 @@ def search_part():
         code=307)  # 307 = post
 
 
-@app.route('/search_mkt')
+@app.route('/search_mkt', methods=['POST'])
 def search_mkt():
-    name = request.args['mkt']
-    current_driver = return_current_driver()
-    search_item(current_driver, name)
+    name = request.form['mkt']
+    search_item(driver, name)
+    return redirect(url_for('index'), code=302)
 
 
 if __name__ == '__main__':
