@@ -54,6 +54,9 @@ class Driver:
         self.search_vin(car.vin)
 
         car_name = self.get_car_name()
+        if not car_name:
+            logger.exception(f"vin not found: {car.vin}")
+            return "לא נמצא מספר שלדה", car.license_plate, car.vin
         CarMapper.name_car_by_vin(car, car_name)
         part_numbers = self.over_every_parts(parts, car_name)
         return part_numbers, car.license_plate, car.vin
