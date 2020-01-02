@@ -2,6 +2,7 @@ from Log import logger
 
 MAX_LENGTH_PER_WORD = 15
 IMAGES_FOLDER = 'images'
+USER_FILE = 'ConnectionDetails.txt'
 NUMBER_OF_RETRIES_FOR_CHANGE_LANGUAGE = 2
 
 

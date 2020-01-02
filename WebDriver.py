@@ -17,7 +17,6 @@ def singleton(class_):
 
     return get_instance
 
-
 class Driver:
 
     def __init__(self):
@@ -45,7 +44,7 @@ class Driver:
                     break
         except NoSuchElementException:
             logger.exception("User name or password are wrong!")
-            raise NoSuchElementException("User name or password are wrong!")
+            raise ValueError("User name or password are wrong!")
 
     def show_popup_with_explanation(self, parts: [Part], car: CarMapper):
         self.close_other_windows()
@@ -131,7 +130,7 @@ class Driver:
             f'{capitalize(part.section)}').click()  # white background links with brown titles
         self._driver.implicitly_wait(3)
         self._driver.find_element_by_xpath(
-            f'//*[@id="divTabDoc"]//li/a[contains(text(),"{capitalize(part.bsquare)}")]').click()  # blue background
+            f'//*[@id="divTabDoc"]//li/a[contains(text(),"Parts")]').click()  # blue background
         self._driver.find_element_by_xpath(
             f'/html/body/div[4]/div[3]/div[3]/table/tbody/tr[3]/td/div[3]/div[2]/table/tbody//td[contains(text(), '
             f'"{part.line.upper()}")]').click()
