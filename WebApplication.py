@@ -64,8 +64,8 @@ def return_current_driver():
 
 @app.route('/search_part', methods=['POST'])
 def search_part():
-    vin = request.form['vin'].upper()
-    license_plate = request.form['license_plate']
+    vin = request.form['vin'].upper().strip()
+    license_plate = request.form['license_plate'].strip()
     part_name = request.form['part_name']
     current_driver = return_current_driver()
     part_numbers, license_plate, vin = main_flow(current_driver, vin, license_plate, part_name)
@@ -76,7 +76,7 @@ def search_part():
 
 @app.route('/search_mkt', methods=['POST'])
 def search_mkt():
-    name = request.form['mkt']
+    name = request.form['mkt'].strip()
     search_item(driver, name)
     return redirect(url_for('index'), code=302)
 

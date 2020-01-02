@@ -131,15 +131,16 @@ class Driver:
             self._driver.switch_to.window(self._driver.window_handles[0])
 
     def go_to_part(self, part):
-        self._driver.find_element_by_xpath(f'//*[@id="global"]/div[2]/ul//a[text()="{capitalize(part.cat)}"]').click()
+        self._driver.find_element_by_xpath(
+            f'//*[@id="global"]/div[2]/ul//a[text()="{capitalize(part.cat.strip())}"]').click()
         self._driver.find_element_by_link_text(
-            f'{capitalize(part.section)}').click()  # white background links with brown titles
+            f'{capitalize(part.section.strip())}').click()  # white background links with brown titles
         self._driver.implicitly_wait(3)
         self._driver.find_element_by_xpath(
             f'//*[@id="divTabDoc"]//li/a[contains(text(),"Parts")]').click()  # blue background
         self._driver.find_element_by_xpath(
             f'/html/body/div[4]/div[3]/div[3]/table/tbody/tr[3]/td/div[3]/div[2]/table/tbody//td[contains(text(), '
-            f'"{part.line.upper()}")]').click()
+            f'"{part.line.strip().upper()}")]').click()
         self._driver.switch_to.window(self._driver.window_handles[1])
 
     def get_car_name(self):
@@ -186,7 +187,7 @@ class Driver:
                     parts_images.append(image_path)
             except Exception as ex:
                 logger.exception(str(ex))
-                logger.exception(f"Can't find these parts by section {sorted_parts[key]}")
+                logger.exception(f"Can't find these parts by section {sorted_parts[key].original_part_name}")
         part_number = self.build_string_from_dict(part_maps, parts_images)
         return part_number
 
