@@ -4,6 +4,7 @@ MAX_LENGTH_PER_WORD = 15
 IMAGES_FOLDER = 'images'
 USER_FILE = 'ConnectionDetails.txt'
 NUMBER_OF_RETRIES_FOR_CHANGE_LANGUAGE = 2
+TIME_TO_CHANGE_LANGUAGE = 7
 
 
 def add_to_clipboard(text: str):

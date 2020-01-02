@@ -22,7 +22,3 @@ class User:
                 key, value = [item.strip() for item in line.strip().split(":")]
                 configuration_dict[key] = value
         return configuration_dict
-
-
-if __name__ == '__main__':
-    User.get_user_details()

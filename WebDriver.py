@@ -17,6 +17,7 @@ def singleton(class_):
 
     return get_instance
 
+
 class Driver:
 
     def __init__(self):
@@ -27,16 +28,19 @@ class Driver:
 
     def login(self, user: User):
         import time
-        self._driver.get(f"https://{user.name}:{user.password}@servicebox.peugeot.com/pages/frames/loadPage.jsp")
+        user_details = User.get_user_details()
+        user_name = user_details['USER_NAME']
+        password = user_details['PASSWORD']
+        self._driver.get(f"https://{user_name}:{password}@servicebox.peugeot.com/pages/frames/loadPage.jsp")
         try:
-            self._driver.find_element_by_xpath('//*[@id="userid"]').send_keys(user.name)
-            self._driver.find_element_by_xpath('//*[@id="password"]').send_keys(user.password)
+            self._driver.find_element_by_xpath('//*[@id="userid"]').send_keys(user_name)
+            self._driver.find_element_by_xpath('//*[@id="password"]').send_keys(password)
             for _ in range(NUMBER_OF_RETRIES_FOR_CHANGE_LANGUAGE):
                 self._driver.get("https://servicebox.peugeot.com/do/parametrer")
                 self._driver.find_element_by_xpath('//*[@id="menuTools"]/li[5]/a').click()
-                time.sleep(7)
+                time.sleep(TIME_TO_CHANGE_LANGUAGE)
                 self._driver.find_element_by_xpath('//*[@id="langue"]//option[@value="en_GB"]').click()
-                time.sleep(7)
+                time.sleep(TIME_TO_CHANGE_LANGUAGE)
                 self._driver.find_element_by_xpath('//*[@id="global"]/div/form[1]/table/tbody/tr[6]/td/input').click()
                 if self._driver.find_element_by_xpath('//*[@id="menuTools"]/li[5]/a').text == 'My Profile':
                     user.connected = True
