@@ -1,6 +1,7 @@
+from Helper import USER_FILE
+
+
 class User:
-    name = "da87217"
-    password = "kb2852ru"
 
     def __init__(self):
         self._is_login = False
@@ -12,3 +13,16 @@ class User:
     @connected.setter
     def connected(self, value: bool):
         self._is_login = value
+
+    @staticmethod
+    def get_user_details():
+        configuration_dict = {}
+        with open(USER_FILE) as file:
+            for line in file:
+                key, value = [item.strip() for item in line.strip().split(":")]
+                configuration_dict[key] = value
+        return configuration_dict
+
+
+if __name__ == '__main__':
+    User.get_user_details()

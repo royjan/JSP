@@ -1,3 +1,4 @@
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver import Chrome
 from Helper import *
 from Part import Part
@@ -16,7 +17,6 @@ def singleton(class_):
 
     return get_instance
 
-@singleton
 class Driver:
 
     def __init__(self):
@@ -27,18 +27,24 @@ class Driver:
 
     def login(self, user: User):
         import time
-        while not user.connected:
-            self._driver.get(f"https://{user.name}:{user.password}@servicebox.peugeot.com/pages/frames/loadPage.jsp")
+        self._driver.get(f"https://{user.name}:{user.password}@servicebox.peugeot.com/pages/frames/loadPage.jsp")
+        try:
             self._driver.find_element_by_xpath('//*[@id="userid"]').send_keys(user.name)
             self._driver.find_element_by_xpath('//*[@id="password"]').send_keys(user.password)
-            self._driver.get("https://servicebox.peugeot.com/do/parametrer")
-            self._driver.find_element_by_xpath('//*[@id="menuTools"]/li[5]/a').click()
-            time.sleep(TIME_SLEEP)
-            self._driver.find_element_by_xpath('//*[@id="langue"]//option[@value="en_GB"]').click()
-            time.sleep(TIME_SLEEP)
-            self._driver.find_element_by_xpath('//*[@id="global"]/div/form[1]/table/tbody/tr[6]/td/input').click()
-            user.connected = True
-        self.home_page()
+            for _ in range(NUMBER_OF_RETRIES_FOR_CHANGE_LANGUAGE):
+                self._driver.get("https://servicebox.peugeot.com/do/parametrer")
+                self._driver.find_element_by_xpath('//*[@id="menuTools"]/li[5]/a').click()
+                time.sleep(TIME_SLEEP)
+                self._driver.find_element_by_xpath('//*[@id="langue"]//option[@value="en_GB"]').click()
+                time.sleep(TIME_SLEEP)
+                self._driver.find_element_by_xpath('//*[@id="global"]/div/form[1]/table/tbody/tr[6]/td/input').click()
+                if self._driver.find_element_by_xpath('//*[@id="menuTools"]/li[5]/a').text == 'My Profile':
+                    user.connected = True
+                    self.home_page()
+                    break
+        except NoSuchElementException:
+            logger.exception("User name or password are wrong!")
+            raise ValueError("User name or password are wrong!")
 
     def show_popup_with_explanation(self, parts: [Part], car: CarMapper):
         self.close_other_windows()
@@ -47,8 +53,12 @@ class Driver:
         self.search_vin(car.vin)
 
         car_name = self.get_car_name()
+        if not car_name:
+            logger.exception(f"vin not found: {car.vin}")
+            return "לא נמצא מספר שלדה", car.license_plate, car.vin
         CarMapper.name_car_by_vin(car, car_name)
-        part_numbers = self.over_every_parts(parts, car_name)
+        parts_sorted = Part.sort_parts_by_sections(parts)
+        part_numbers = self.over_every_parts(parts_sorted, car_name)
         return part_numbers, car.license_plate, car.vin
 
     def take_screen_shot(self, part_mapper: PartMapper):
@@ -122,7 +132,7 @@ class Driver:
             f'{capitalize(part.section)}').click()  # white background links with brown titles
         self._driver.implicitly_wait(3)
         self._driver.find_element_by_xpath(
-            f'//*[@id="divTabDoc"]//li/a[contains(text(),"{capitalize(part.bsquare)}")]').click()  # blue background
+            f'//*[@id="divTabDoc"]//li/a[contains(text(),"Parts")]').click()  # blue background
         self._driver.find_element_by_xpath(
             f'/html/body/div[4]/div[3]/div[3]/table/tbody/tr[3]/td/div[3]/div[2]/table/tbody//td[contains(text(), '
             f'"{part.line.upper()}")]').click()
@@ -139,27 +149,40 @@ class Driver:
     @staticmethod
     def build_string_from_dict(part_maps: dict, image_path: list) -> str:
         parts = []
-        for (part_name, part_number), path in zip(part_maps.items(), image_path):
-            path = path.encode("ascii", "ignore")
-            path = path.decode('ascii')
-            parts.append(f'{part_name} : {part_number} <a target=_blank href={path}>תמונה</a>')
+        if part_maps and image_path:
+            for (part_name, part_number), path in zip(part_maps.items(), image_path):
+                path = path.encode("ascii", "ignore")
+                path = path.decode('ascii')
+                parts.append(f'{part_name} : {part_number} <a target=_blank href={path}>תמונה</a>')
+        else:
+            parts = {"קרתה שגיאה": "נא תסתכל על הלוג"}
         return "|".join(parts)
 
-    def over_every_parts(self, parts, car_name):
+    def over_every_parts(self, sorted_parts, car_name):
+        part_mapper = None
         part_maps = {}
         parts_images = []
-        for part in parts:
+        for key in sorted_parts.keys():  # key = entire section
             self.close_other_windows()
-            self.go_to_part(part)
-            part_number = self.copy_part_number(part, car_name)
-            part_mapper = PartMapper(part.name, car_name, part_number)
-            if part_number != "NotAValue":
-                PartMapper.add_part(part_mapper)
-                image_path = self.take_screen_shot(part_mapper)
-            else:
-                image_path = ""
-            part_maps[part.name] = part_number
-            parts_images.append(image_path)
+            try:
+                self.go_to_part(sorted_parts[key][0])
+                for part in sorted_parts[key]:
+                    try:
+                        part_number = self.copy_part_number(part, car_name)
+                        part_mapper = PartMapper(part.name, car_name, part_number)
+                    except NoSuchElementException:
+                        logger.exception(f"No part {part.original_part_name} for {car_name}")
+                        part_number = "NotAValue"
+                    if part_number != "NotAValue":
+                        PartMapper.add_part(part_mapper)
+                        image_path = self.take_screen_shot(part_mapper)
+                    else:
+                        image_path = ""
+                    part_maps[part.name] = part_number
+                    parts_images.append(image_path)
+            except Exception as ex:
+                logger.exception(str(ex))
+                logger.exception(f"Can't find these parts by section {sorted_parts[key]}")
         part_number = self.build_string_from_dict(part_maps, parts_images)
         return part_number
 

@@ -53,18 +53,22 @@ def favicon():
                                mimetype='image/vnd.microsoft.icon')
 
 
+def return_current_driver():
+    global driver
+    try:
+        driver._driver.title
+    except (WebDriverException, AttributeError) as e:
+        driver = init_driver()
+    return driver
+
+
 @app.route('/search_part', methods=['POST'])
 def search_part():
     vin = request.form['vin'].upper()
     license_plate = request.form['license_plate']
     part_name = request.form['part_name']
-    global driver
-    try:
-        driver._driver.title
-    except (WebDriverException, AttributeError) as e:
-        # if e.msg.startswith('chrome not reachable'):
-        driver = init_driver()
-    part_numbers, license_plate, vin = main_flow(driver, vin, license_plate, part_name)
+    current_driver = return_current_driver()
+    part_numbers, license_plate, vin = main_flow(current_driver, vin, license_plate, part_name)
     return redirect(
         url_for('index', vin=vin, license_plate=license_plate, part_numbers=part_numbers),
         code=307)  # 307 = post

@@ -1,9 +1,11 @@
 from CarMapper import CarMapper
+from Helper import retries
 from Part import Part
 from User import User
 from WebDriver import Driver
 
 
+@retries(num_of_tries=2)
 def init_driver():
     my_user = User()
     web_driver = Driver()
