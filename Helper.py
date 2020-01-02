@@ -3,6 +3,7 @@ from Log import logger
 MAX_LENGTH_PER_WORD = 15
 IMAGES_FOLDER = 'images'
 USER_FILE = 'ConnectionDetails.txt'
+NUMBER_OF_RETRIES_FOR_CHANGE_LANGUAGE = 2
 
 
 def add_to_clipboard(text: str):
@@ -29,16 +30,17 @@ def retries(num_of_tries: int = 3):
             return True, result
         except Exception as e:
             logger.error(str(e))
-            return False, None
+            return False, str(e)
 
     def retry_deco(func):
         from functools import wraps
+
         @wraps(func)
         def wrapper(*args, **kwargs):
             for try_number in range(num_of_tries):
                 success, result = try_execute(func, *args, **kwargs)
                 if success:
-                    return success
+                    return result
                 logger.error(f'{func.__name__} failed in try number {try_number + 1}')
             raise Exception(f"Failed after {num_of_tries} times!")
 

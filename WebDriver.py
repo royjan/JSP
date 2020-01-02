@@ -1,3 +1,4 @@
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver import Chrome
 from Helper import *
 from Part import Part
@@ -16,8 +17,6 @@ def singleton(class_):
 
     return get_instance
 
-
-@singleton
 class Driver:
 
     def __init__(self):
@@ -28,21 +27,24 @@ class Driver:
 
     def login(self, user: User):
         import time
-        while not user.connected:
-            config = User.get_user_details()
-            user_name, password = config['USER_NAME'], config['PASSWORD']
-            self._driver.get(f"https://{user_name}:{password}@servicebox.peugeot.com/pages/frames"
-                             f"/loadPage.jsp")
-            self._driver.find_element_by_xpath('//*[@id="userid"]').send_keys(user_name)
-            self._driver.find_element_by_xpath('//*[@id="password"]').send_keys(password)
-            self._driver.get("https://servicebox.peugeot.com/do/parametrer")
-            self._driver.find_element_by_xpath('//*[@id="menuTools"]/li[5]/a').click()
-            time.sleep(7)
-            self._driver.find_element_by_xpath('//*[@id="langue"]//option[@value="en_GB"]').click()
-            time.sleep(7)
-            self._driver.find_element_by_xpath('//*[@id="global"]/div/form[1]/table/tbody/tr[6]/td/input').click()
-            user.connected = True
-        self.home_page()
+        self._driver.get(f"https://{user.name}:{user.password}@servicebox.peugeot.com/pages/frames/loadPage.jsp")
+        try:
+            self._driver.find_element_by_xpath('//*[@id="userid"]').send_keys(user.name)
+            self._driver.find_element_by_xpath('//*[@id="password"]').send_keys(user.password)
+            for _ in range(NUMBER_OF_RETRIES_FOR_CHANGE_LANGUAGE):
+                self._driver.get("https://servicebox.peugeot.com/do/parametrer")
+                self._driver.find_element_by_xpath('//*[@id="menuTools"]/li[5]/a').click()
+                time.sleep(7)
+                self._driver.find_element_by_xpath('//*[@id="langue"]//option[@value="en_GB"]').click()
+                time.sleep(7)
+                self._driver.find_element_by_xpath('//*[@id="global"]/div/form[1]/table/tbody/tr[6]/td/input').click()
+                if self._driver.find_element_by_xpath('//*[@id="menuTools"]/li[5]/a').text == 'My Profile':
+                    user.connected = True
+                    self.home_page()
+                    break
+        except NoSuchElementException:
+            logger.exception("User name or password are wrong!")
+            raise ValueError("User name or password are wrong!")
 
     def show_popup_with_explanation(self, parts: [Part], car: CarMapper):
         self.close_other_windows()
@@ -51,6 +53,9 @@ class Driver:
         self.search_vin(car.vin)
 
         car_name = self.get_car_name()
+        if not car_name:
+            logger.exception(f"vin not found: {car.vin}")
+            return "לא נמצא מספר שלדה", car.license_plate, car.vin
         CarMapper.name_car_by_vin(car, car_name)
         part_numbers = self.over_every_parts(parts, car_name)
         return part_numbers, car.license_plate, car.vin
@@ -151,11 +156,16 @@ class Driver:
     def over_every_parts(self, parts, car_name):
         part_maps = {}
         parts_images = []
+        part_mapper = None
         for part in parts:
             self.close_other_windows()
-            self.go_to_part(part)
-            part_number = self.copy_part_number(part, car_name)
-            part_mapper = PartMapper(part.name, car_name, part_number)
+            try:
+                self.go_to_part(part)
+                part_number = self.copy_part_number(part, car_name)
+                part_mapper = PartMapper(part.name, car_name, part_number)
+            except NoSuchElementException:
+                logger.exception(f"No part {part.original_part_name} for {car_name}")
+                part_number = "NotAValue"
             if part_number != "NotAValue":
                 PartMapper.add_part(part_mapper)
                 image_path = self.take_screen_shot(part_mapper)
