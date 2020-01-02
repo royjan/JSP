@@ -154,11 +154,16 @@ class Driver:
     def over_every_parts(self, parts, car_name):
         part_maps = {}
         parts_images = []
+        part_mapper = None
         for part in parts:
             self.close_other_windows()
-            self.go_to_part(part)
-            part_number = self.copy_part_number(part, car_name)
-            part_mapper = PartMapper(part.name, car_name, part_number)
+            try:
+                self.go_to_part(part)
+                part_number = self.copy_part_number(part, car_name)
+                part_mapper = PartMapper(part.name, car_name, part_number)
+            except NoSuchElementException:
+                logger.exception(f"No part {part.original_part_name} for {car_name}")
+                part_number = "NotAValue"
             if part_number != "NotAValue":
                 PartMapper.add_part(part_mapper)
                 image_path = self.take_screen_shot(part_mapper)
