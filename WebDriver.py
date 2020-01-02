@@ -1,3 +1,4 @@
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver import Chrome
 from Helper import *
 from Part import Part
@@ -140,28 +141,40 @@ class Driver:
     @staticmethod
     def build_string_from_dict(part_maps: dict, image_path: list) -> str:
         parts = []
-        for (part_name, part_number), path in zip(part_maps.items(), image_path):
-            path = path.encode("ascii", "ignore")
-            path = path.decode('ascii')
-            parts.append(f'{part_name} : {part_number} <a target=_blank href={path}>תמונה</a>')
+        if part_maps and image_path:
+            for (part_name, part_number), path in zip(part_maps.items(), image_path):
+                path = path.encode("ascii", "ignore")
+                path = path.decode('ascii')
+                parts.append(f'{part_name} : {part_number} <a target=_blank href={path}>תמונה</a>')
+        else:
+            parts = {"קרתה שגיאה": "נא תסתכל על הלוג"}
         return "|".join(parts)
 
     def over_every_parts(self, sorted_parts, car_name):
+        part_mapper = None
         part_maps = {}
         parts_images = []
         for key in sorted_parts.keys():  # key = entire section
             self.close_other_windows()
-            self.go_to_part(sorted_parts[key][0])
-            for part in sorted_parts[key]:
-                part_number = self.copy_part_number(part, car_name)
-                part_mapper = PartMapper(part.name, car_name, part_number)
-                if part_number != "NotAValue":
-                    PartMapper.add_part(part_mapper)
-                    image_path = self.take_screen_shot(part_mapper)
-                else:
-                    image_path = ""
-                part_maps[part.name] = part_number
-                parts_images.append(image_path)
+            try:
+                self.go_to_part(sorted_parts[key][0])
+                for part in sorted_parts[key]:
+                    try:
+                        part_number = self.copy_part_number(part, car_name)
+                        part_mapper = PartMapper(part.name, car_name, part_number)
+                    except NoSuchElementException:
+                        logger.exception(f"No part {part.original_part_name} for {car_name}")
+                        part_number = "NotAValue"
+                    if part_number != "NotAValue":
+                        PartMapper.add_part(part_mapper)
+                        image_path = self.take_screen_shot(part_mapper)
+                    else:
+                        image_path = ""
+                    part_maps[part.name] = part_number
+                    parts_images.append(image_path)
+            except Exception as ex:
+                logger.exception(str(ex))
+                logger.exception(f"Can't find these parts by section {sorted_parts[key]}")
         part_number = self.build_string_from_dict(part_maps, parts_images)
         return part_number
 
