@@ -13,6 +13,16 @@ CREATE TABLE IF NOT EXISTS `kits` (
   PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+CREATE TABLE IF NOT EXISTS `parts` (
+  `name` varchar(255) NOT NULL,
+  `cat` text,
+  `section` text,
+  `line` text,
+  `original_part_name` text,
+  PRIMARY KEY (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
 CREATE TABLE IF NOT EXISTS `part_mapping` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `part_name` varchar(256) NOT NULL,
@@ -23,11 +33,3 @@ CREATE TABLE IF NOT EXISTS `part_mapping` (
   CONSTRAINT `part_mapping_ibfk_1` FOREIGN KEY (`part_name`) REFERENCES `parts` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE IF NOT EXISTS `parts` (
-  `name` varchar(255) NOT NULL,
-  `cat` text,
-  `section` text,
-  `line` text,
-  `original_part_name` text,
-  PRIMARY KEY (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
