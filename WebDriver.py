@@ -69,7 +69,8 @@ class Driver:
         try:
             import os
             folders = os.listdir(IMAGES_FOLDER)
-            car_folder = part_mapper.car_name[:MAX_LENGTH_PER_WORD].replace(" ", "_")
+            car_folder = remove_hebrew(part_mapper.car_name)
+            car_folder = car_folder[:MAX_LENGTH_PER_WORD].replace(" ", "_")
             if car_folder not in folders:
                 os.makedirs(f'{IMAGES_FOLDER}/{car_folder}')
             file_path = f'{IMAGES_FOLDER}/{part_mapper.car_name[:MAX_LENGTH_PER_WORD]}/' \
@@ -97,7 +98,7 @@ class Driver:
                     f'//td[contains(@class, "colref")]')
                 if len(part_number) > 0:
                     return part_number[0].text
-        return "NotAValue"
+        return NotAValue
 
     def copy_part_number(self, part: Part, car_name: str = "") -> str:
         part_number = self.get_value_from_multi_part_numbers(part)
@@ -156,9 +157,13 @@ class Driver:
         parts = []
         if part_maps and image_path:
             for (part_name, part_number), path in zip(part_maps.items(), image_path):
-                path = path.encode("ascii", "ignore")
-                path = path.decode('ascii')
-                parts.append(f'{part_name} : {part_number} <a target=_blank href={path}>תמונה</a>')
+                path = remove_hebrew(path)
+                if part_number != NotAValue.replace(" ", ""):
+                    temp_string = f'{part_name} : {part_number}'
+                    temp_string += f' <a target=_blank href={path}>תמונה</a>'
+                else:
+                    temp_string = f'{part_name} : {NotAValue}'
+                parts.append(temp_string)
         else:
             parts = {"קרתה שגיאה": "נא תסתכל על הלוג"}
         return "|".join(parts)
@@ -177,8 +182,8 @@ class Driver:
                         part_mapper = PartMapper(part.name, car_name, part_number)
                     except NoSuchElementException:
                         logger.exception(f"No part {part.original_part_name} for {car_name}")
-                        part_number = "NotAValue"
-                    if part_number != "NotAValue":
+                        part_number = NotAValue
+                    if part_number != NotAValue.replace(" ", ""):
                         PartMapper.add_part(part_mapper)
                         image_path = self.take_screen_shot(part_mapper)
                     else:
@@ -187,7 +192,7 @@ class Driver:
                     parts_images.append(image_path)
             except Exception as ex:
                 logger.exception(str(ex))
-                logger.exception(f"Can't find these parts by section {sorted_parts[key].original_part_name}")
+                logger.exception(f"Can't find these parts by sections")
         part_number = self.build_string_from_dict(part_maps, parts_images)
         return part_number
 

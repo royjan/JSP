@@ -34,7 +34,7 @@ function submitItems() {
     let license_plate = document.getElementById('license_plate').value;
     let parts_name = document.getElementById('part_name').value;
     let parts = document.getElementById('part_name').value.split(",");
-    parts = parts.filter(value => value.startsWith("קיט"));
+    parts = parts.filter(value => value.startsWith("טיפול"));
     for (let index = 0; index < parts.length; index++) {
         let data = $.ajax({
             async: false,

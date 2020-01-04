@@ -1,10 +1,19 @@
 from Log import logger
 
-MAX_LENGTH_PER_WORD = 15
+MAX_LENGTH_PER_WORD = 30
 IMAGES_FOLDER = 'images'
 USER_FILE = 'ConnectionDetails.txt'
 NUMBER_OF_RETRIES_FOR_CHANGE_LANGUAGE = 2
 TIME_TO_CHANGE_LANGUAGE = 7
+NotAValue = "לא נמצא"
+
+
+def remove_hebrew(string: str):
+    string = string.encode("ascii", "ignore")
+    string = string.decode('ascii')
+    string = string.split()
+    string = ' '.join(string)
+    return string
 
 
 def add_to_clipboard(text: str):
