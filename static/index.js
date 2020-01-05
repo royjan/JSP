@@ -1,5 +1,6 @@
 $('.flexdatalist').flexdatalist({
-    minLength: 2
+    minLength: 2,
+    searchByWord: true
 });
 
 $(function () {
