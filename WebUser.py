@@ -1,7 +1,7 @@
 from Helper import USER_FILE
 
 
-class User:
+class WebUser:
 
     def __init__(self):
         self._is_login = False

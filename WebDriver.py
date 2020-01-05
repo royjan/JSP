@@ -3,7 +3,7 @@ from selenium.webdriver import Chrome
 from Helper import *
 from Part import Part
 from PartMapper import PartMapper
-from User import User
+from WebUser import WebUser
 from CarMapper import CarMapper
 
 
@@ -26,9 +26,9 @@ class Driver:
     def home_page(self):
         self._driver.get("https://servicebox.peugeot.com/docapvpr/")
 
-    def login(self, user: User):
+    def login(self, user: WebUser):
         import time
-        user_details = User.get_user_details()
+        user_details = WebUser.get_user_details()
         user_name = user_details['USER_NAME']
         password = user_details['PASSWORD']
         self._driver.get(f"https://{user_name}:{password}@servicebox.peugeot.com/pages/frames/loadPage.jsp")

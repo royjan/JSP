@@ -1,0 +1,37 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{{ url_for('static', filename='semantic.rtl.min.css') }}" rel="stylesheet" type="text/css">
+    <!-- 2.4.1 -->
+    <script src="{{ url_for('static', filename='jquery.min.js') }}"></script> <!-- 3.4.1 -->
+    <style>
+        div, span, button {
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body style="direction: rtl;">
+<h1>נא התחבר</h1>
+<br>
+<form action="" method="post">
+    <div class="ui equal width form">
+        <div class="fields">
+            <div class="field">
+                <label>שם משתמש</label>
+                <input type="text" name="username" value="{{ request.form.username }}">
+            </div>
+            <div class="field">
+                <label>סיסמה</label>
+                <input type="password" name="password" value="{{ request.form.password }}">
+            </div>
+        </div>
+        <input class="btn btn-default" type="submit" value="התחבר">
+    </div>
+</form>
+{% if error %}
+    <p class="error"><strong>שגיאה:</strong> {{ error }}
+{% endif %}
+</body>
+</html>

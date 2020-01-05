@@ -1,5 +1,5 @@
 from dictalchemy import make_class_dictable
-from sqlalchemy import Column, String, ARRAY
+from sqlalchemy import Column, String
 from sqlalchemy.ext.declarative import declarative_base
 
 from DataBaseSession import DataBaseSession
