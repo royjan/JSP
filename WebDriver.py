@@ -62,8 +62,8 @@ class Driver:
             return "לא נמצא מספר שלדה", car.license_plate, car.vin
         CarMapper.name_car_by_vin(car, car_name)
         parts_sorted = Part.sort_parts_by_sections(parts)
-        part_numbers = self.over_every_parts(parts_sorted, car_name)
-        return part_numbers, car.license_plate, car.vin
+        string_to_web = self.over_every_parts(parts_sorted, car_name)
+        return string_to_web, car.license_plate, car.vin
 
     def take_screen_shot(self, part_mapper: PartMapper):
         try:
@@ -193,8 +193,9 @@ class Driver:
             except Exception as ex:
                 logger.exception(str(ex))
                 logger.exception(f"Can't find these parts by sections")
-        part_number = self.build_string_from_dict(part_maps, parts_images)
-        return part_number
+        string_to_web = self.build_string_from_dict(part_maps, parts_images)
+        string_to_web = f"<b>סוג רכב</b> : {car_name}|" + string_to_web
+        return string_to_web
 
     @staticmethod
     def left_and_right_scenario(part, items):
