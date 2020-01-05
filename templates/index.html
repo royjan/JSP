@@ -9,13 +9,11 @@
     <script src="{{ url_for('static', filename='jquery.min.js') }}"></script> <!-- 3.4.1 -->
     <script src="{{ url_for('static', filename='jquery.flexdatalist.min.js') }}"></script> <!-- 2.2.4 -->
     <script src="{{ url_for('static', filename='index.js') }}"></script>
-    <script>
     <style>
         div, span, button {
             font-size: 1.5rem;
         }
     </style>
-    </script>
 </head>
 <body style="direction: rtl;">
 <form method="get" id="thisform">
@@ -84,6 +82,7 @@
         {% endif %}
         </div>
         <button type="button" class="ui button" id="myBtn" onclick="submitItems()">שלח</button>
+        <input type="reset" id="reset-button" class="ui button" value="אפס" />
     </div>
 </form>
 <form method="post" id="mktform" action="search_mkt">
@@ -94,6 +93,7 @@
             <input type="text" placeholder="מחפש..." style="direction: rtl;" id="mkt" name="mkt" multiple='multiple'/>
         </div>
         <button type="button" class="ui button" id="mktBtn" onclick="submitMkt()">שלח</button>
+        <input type="reset" class="ui button" value="אפס"/>
     </div>
 </form>
 <script type="text/javascript">

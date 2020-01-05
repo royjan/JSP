@@ -59,7 +59,7 @@ class Part(Base):
 
 if __name__ == '__main__':
     # Part.create_db()
-    df = pd.read_csv('db2.csv', encoding='utf8')
+    df = pd.read_csv('DB.csv', encoding='utf8')
     df = df.drop_duplicates(subset=['name'])
     for i in range(len(df)):
         try:
