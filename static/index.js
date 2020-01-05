@@ -2,6 +2,12 @@ $('.flexdatalist').flexdatalist({
     minLength: 2
 });
 
+$(function () {
+    $("#reset-button").click(function () {
+        $('#part_name').val('').parent().find("ul.flexdatalist-multiple li.value").remove();
+    });
+});
+
 function MyOption() {
     let value = $('#search-box').val();
     if (value === 'mkt') {
