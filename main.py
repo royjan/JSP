@@ -1,13 +1,13 @@
 from CarMapper import CarMapper
 from Helper import retries
 from Part import Part
-from User import User
+from WebUser import WebUser
 from WebDriver import Driver
 
 
 @retries(num_of_tries=2)
 def init_driver():
-    my_user = User()
+    my_user = WebUser()
     web_driver = Driver()
     web_driver.login(my_user)
     return web_driver

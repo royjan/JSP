@@ -3,6 +3,7 @@ from sqlalchemy import Column, String
 from sqlalchemy.ext.declarative import declarative_base
 from DataBaseSession import DataBaseSession
 from Log import logger
+from flask_login import current_user
 
 Base = declarative_base()
 make_class_dictable(Base)
@@ -40,24 +41,24 @@ class CarMapper(Base):
 
     def add_to_db_result(self):
         db_car = None
-        if self.vin:                                                            # try to get car by vin
+        if self.vin:  # try to get car by vin
             db_car = CarMapper.get_car_by_vin(self.vin)
-            if not self.license_plate and db_car:                               # if not has license plate
+            if not self.license_plate and db_car:  # if not has license plate
                 self.license_plate = db_car.license_plate
                 return
-        elif self.license_plate and not self.vin:                               # try to get car by license plate
+        elif self.license_plate and not self.vin:  # try to get car by license plate
             db_car = CarMapper.get_car_by_license_plate(self.license_plate)
             if db_car:
-                self.vin = db_car.vin                                           # if exists -> update object
+                self.vin = db_car.vin  # if exists -> update object
                 return
-        if db_car:                                                              # if exists but the same
+        if db_car:  # if exists but the same
             if self == db_car:
                 return
-            if self.vin and self.license_plate:                                 # if needs to overwrite
+            if self.vin and self.license_plate:  # if needs to overwrite
                 if self.license_plate != db_car.license_plate:
-                    CarMapper.update_car_by_license_plate(self, "roy")
+                    CarMapper.update_car_by_license_plate(self)
         else:
-            CarMapper.add_if_needed(self)                                       # a new one
+            CarMapper.add_if_needed(self)  # a new one
 
     @classmethod
     def get_car_by_vin(cls, vin: str):
@@ -73,8 +74,9 @@ class CarMapper(Base):
         cls.db_session.commit()
 
     @classmethod
-    def update_car_by_license_plate(cls, obj, user: str):
-        logger.warning(f"Overwrite an existing VIN {obj.vin} license plate to {obj.license_plate} by {user}")
+    def update_car_by_license_plate(cls, obj):
+        logger.warning(
+            f"Overwrite an existing VIN {obj.vin} license plate to {obj.license_plate} by {current_user.user_name}")
         cls.db_session.query(cls).filter(cls.vin == obj.vin).update({cls.license_plate: obj.license_plate})
         cls.db_session.commit()
 
