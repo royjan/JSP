@@ -108,6 +108,9 @@ def log_search_part(part_name, vin, license_plate):
         body += f"license plate={license_plate}"
     logger.info(body)
 
+def log_search_mkt(mkt):
+    logger.info(f"User: {current_user.user_name} is looking for {mkt}")
+
 
 @app.route('/search_part', methods=['POST'])
 def search_part():
@@ -125,6 +128,7 @@ def search_part():
 @app.route('/search_mkt', methods=['POST'])
 def search_mkt():
     name = request.form['mkt'].strip()
+    log_search_mkt(name)
     search_item(driver, name)
     return redirect(url_for('index'), code=302)
 
