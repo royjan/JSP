@@ -22,7 +22,7 @@ app.secret_key = 'tapuZ'
 login_manager = setup_login_manager(app)
 
 
-# driver = init_driver()
+driver = init_driver()
 @app.route('/logout', methods=['GET'])
 def logout():
     from flask_login import logout_user

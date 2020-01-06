@@ -18,6 +18,9 @@ def singleton(class_):
     return get_instance
 
 
+
+
+
 class Driver:
 
     def __init__(self):
@@ -132,16 +135,11 @@ class Driver:
             self._driver.switch_to.window(self._driver.window_handles[0])
 
     def go_to_part(self, part):
-        self._driver.find_element_by_xpath(
-            f'//*[@id="global"]/div[2]/ul//a[text()="{capitalize(part.cat.strip())}"]').click()
-        self._driver.find_element_by_link_text(
-            f'{capitalize(part.section.strip())}').click()  # white background links with brown titles
+        self.click_on_category(part)
+        self.click_on_section(part)
         self._driver.implicitly_wait(3)
-        self._driver.find_element_by_xpath(
-            f'//*[@id="divTabDoc"]//li/a[contains(text(),"Parts")]').click()  # blue background
-        self._driver.find_element_by_xpath(
-            f'/html/body/div[4]/div[3]/div[3]/table/tbody/tr[3]/td/div[3]/div[2]/table/tbody//td[contains(text(), '
-            f'"{part.line.strip().upper()}")]').click()
+        self.click_on_bsquare(part)
+        self.click_on_line(part)
         self._driver.switch_to.window(self._driver.window_handles[1])
 
     def get_car_name(self):
@@ -214,3 +212,44 @@ class Driver:
                         return item.find_element_by_class_name("colref").text
                     else:
                         return current_items[index + 1].find_element_by_class_name("colref").text
+
+    def click_on_section(self, part):
+        sections = [section.strip() for section in part.section.split('|')]
+        for section in sections:
+            item = self._driver.find_elements_by_link_text(
+                f'{capitalize(section)}')
+            if item:
+                item[0].click()  # white background links with brown titles
+                return
+
+    def click_on_line(self, part):
+        lines = [line.strip().upper() for line in part.line.split('|')]
+        for line in lines:
+            item = self._driver.find_elements_by_xpath(
+            f'/html/body/div[4]/div[3]/div[3]/table/tbody/tr[3]/td/div[3]/div[2]/table/tbody//td[contains(text(), '
+            f'"{line}")]')
+            if item:
+                item[0].click()  # white background links with brown titles
+                return
+
+    def click_on_category(self, part):
+        categories = [category.strip().upper() for category in part.cat.split('|')]
+        for category in categories:
+            item = self._driver.find_elements_by_xpath(
+            f'//*[@id="global"]/div[2]/ul//a[text()="{capitalize(category)}"]')
+            if item:
+                item[0].click()  # white background links with brown titles
+                return
+
+    def click_on_bsquare(self, part):
+        # bsquares = [bsquare.strip() for bsquare in part.bsquare.split('|')]
+        # for bsquare in bsquares:
+        #     item = self._driver.find_elements_by_xpath(
+        #             f'//*[@id="divTabDoc"]//li/a[contains(text(),"Parts")]')
+        #     if item:
+        #         item[0].click()  # white background links with brown titles
+        #         return
+        self._driver.find_element_by_xpath(f'//*[@id="divTabDoc"]//li/a[contains(text(),"Parts")]').click()
+
+
+
