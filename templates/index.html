@@ -68,7 +68,7 @@
                 <option class="right aligned segment">{{ license_plate }}</option>
             {% endfor %}
         </datalist>
-        {% if part_numbers %}}
+        {% if part_numbers %}
             {% set items = part_numbers.split('|') %}
             <div class="ui field">
             <label>רשימת פריטים</label>
@@ -82,7 +82,7 @@
         {% endif %}
         </div>
         <button type="button" class="ui button" id="myBtn" onclick="submitItems()">שלח</button>
-        <input type="reset" id="reset-button" class="ui button" value="אפס" />
+        <button type="button"  class="ui button" onclick="resetBtn()" formaction="/">אפס</button>
     </div>
 </form>
 <form method="post" id="mktform" action="search_mkt">
@@ -93,7 +93,7 @@
             <input type="text" placeholder="מחפש..." style="direction: rtl;" id="mkt" name="mkt" multiple='multiple'/>
         </div>
         <button type="button" class="ui button" id="mktBtn" onclick="submitMkt()">שלח</button>
-        <input type="reset" class="ui button" value="אפס"/>
+        <button type="button" class="ui button" onclick="resetBtn()">אפס</button>
     </div>
 </form>
 <script type="text/javascript">

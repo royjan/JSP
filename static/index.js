@@ -3,6 +3,14 @@ $('.flexdatalist').flexdatalist({
     searchByWord: true
 });
 
+function copyToClipboard(element) {
+    let $temp = $("<input>");
+    $("body").append($temp);
+    $temp.val($(element).text()).select();
+    document.execCommand("copy");
+    $temp.remove();
+}
+
 $(function () {
     $("#reset-button").click(function () {
         $('#part_name').val('').parent().find("ul.flexdatalist-multiple li.value").remove();
@@ -34,6 +42,12 @@ jQuery.ajaxSetup({async: false});
 
 function submitMkt() {
     document.getElementById("mktform").submit();
+}
+
+function resetBtn() {
+   document.getElementById("mktform").reset();
+   document.getElementById("itemsform").reset();
+   window.history.replaceState(null, null, window.location.pathname);
 }
 
 function submitItems() {

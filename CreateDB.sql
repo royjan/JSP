@@ -39,3 +39,7 @@ CREATE TABLE `users` (
   `password` varchar(32) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+SET SQL_SAFE_UPDATES=0;
+delete from jsp.car_mapping where (vin='') or (num_vehicle ='');
+SET SQL_SAFE_UPDATES=1;

@@ -21,8 +21,9 @@ app = Flask(__name__)
 app.secret_key = 'tapuZ'
 login_manager = setup_login_manager(app)
 
-
 driver = init_driver()
+
+
 @app.route('/logout', methods=['GET'])
 def logout():
     from flask_login import logout_user
@@ -108,21 +109,25 @@ def log_search_part(part_name, vin, license_plate):
         body += f"license plate={license_plate}"
     logger.info(body)
 
+
 def log_search_mkt(mkt):
     logger.info(f"User: {current_user.user_name} is looking for {mkt}")
 
 
 @app.route('/search_part', methods=['POST'])
 def search_part():
-    vin = request.form['vin'].upper().strip()
-    license_plate = request.form['license_plate'].strip()
-    part_name = request.form['part_name']
-    log_search_part(part_name, vin, license_plate)
-    current_driver = return_current_driver()
-    part_numbers, license_plate, vin = main_flow(current_driver, vin, license_plate, part_name)
-    return redirect(
-        url_for('index', vin=vin, license_plate=license_plate, part_numbers=part_numbers),
-        code=307)  # 307 = post
+    try:
+        vin = request.form['vin'].upper().strip()
+        license_plate = request.form['license_plate'].strip()
+        part_name = request.form['part_name']
+        log_search_part(part_name, vin, license_plate)
+        current_driver = return_current_driver()
+        part_numbers, license_plate, vin = main_flow(current_driver, vin, license_plate, part_name)
+        return redirect(
+            url_for('index', vin=vin, license_plate=license_plate, part_numbers=part_numbers),
+            code=307)  # 307 = post
+    except:
+        return redirect(url_for('index'), code=302)
 
 
 @app.route('/search_mkt', methods=['POST'])

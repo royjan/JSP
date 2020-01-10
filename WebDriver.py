@@ -154,11 +154,13 @@ class Driver:
     def build_string_from_dict(part_maps: dict, image_path: list) -> str:
         parts = []
         if part_maps and image_path:
-            for (part_name, part_number), path in zip(part_maps.items(), image_path):
+            for num, ((part_name, part_number), path) in enumerate(zip(part_maps.items(), image_path)):
                 path = remove_hebrew(path)
                 if part_number != NotAValue.replace(" ", ""):
-                    temp_string = f'{part_name} : {part_number}'
-                    temp_string += f' <a target=_blank href={path}>תמונה</a>'
+                    temp_string = f'{part_name} : '
+                    temp_string += f'<span id="part{num}">{part_number}</span>'
+                    temp_string += f' <a target=_blank href={path}>תמונה</a> '
+                    temp_string += f'<a href="javascript:void(0);"onclick="copyToClipboard(\'#part{num}\')">העתק מקט</a>'
                 else:
                     temp_string = f'{part_name} : {NotAValue}'
                 parts.append(temp_string)
