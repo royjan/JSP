@@ -21,7 +21,8 @@ app = Flask(__name__)
 app.secret_key = 'tapuZ'
 login_manager = setup_login_manager(app)
 
-driver = init_driver()
+
+# driver = init_driver()
 
 
 @app.route('/logout', methods=['GET'])
@@ -144,5 +145,17 @@ def load_user(user_id):
     return Users.get_user_by_id(user_id)
 
 
+@app.route('/add_car', methods=['POST'])
+def add_car():
+    try:
+        vin = request.form['vin'].upper().strip()
+        license_plate = request.form['license_plate'].strip()
+        add_car_to_db(vin, license_plate)
+        return redirect(
+            url_for('index', vin=vin, license_plate=license_plate), code=302)  # 302 = post
+    except:
+        return redirect(url_for('index'), code=302)
+
+
 if __name__ == '__main__':
-    app.run()
+    app.run(host="0.0.0.0")

@@ -14,10 +14,15 @@ def init_driver():
 
 
 def main_flow(web_driver, vin: str = '', license_plate='', text='גריל מגן'):
-    my_car: CarMapper = CarMapper(vin, license_plate)
-    my_car.add_to_db_result()
+    my_car = add_car_to_db(vin, license_plate)
     parts = Part.get_part_by_name(text)
     return web_driver.show_popup_with_explanation(parts, my_car)
+
+
+def add_car_to_db(vin: str = '', license_plate=''):
+    my_car: CarMapper = CarMapper(vin, license_plate)
+    my_car.add_to_db_result()
+    return my_car
 
 
 def search_item(web_driver, text):
