@@ -17,14 +17,30 @@ $(function () {
     });
 });
 
+function init()
+{
+   MyOption();
+   //Any other functions to be called upon page load go here
+}
+
 function MyOption() {
     let value = $('#search-box').val();
-    if (value === 'mkt') {
+    switch (value) {
+    case 'mkt':
         $('#mktform').show();
         $('#itemsform').hide();
-    } else {
+        $('#thbrform').hide();
+        break;
+    case 'items':
         $('#mktform').hide();
+        $('#thbrform').hide();
         $('#itemsform').show();
+        break;
+    default:
+        $('#mktform').hide();
+        $('#thbrform').show();
+        $('#itemsform').hide();
+        break;
     }
 }
 
@@ -44,9 +60,14 @@ function submitMkt() {
     document.getElementById("mktform").submit();
 }
 
+function submitThbr() {
+    document.getElementById("thbrform").submit();
+}
+
 function resetBtn() {
    document.getElementById("mktform").reset();
    document.getElementById("itemsform").reset();
+   document.getElementById("thbrform").reset();
    window.history.replaceState(null, null, window.location.pathname);
 }
 

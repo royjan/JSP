@@ -9,6 +9,9 @@
     <script src="{{ url_for('static', filename='jquery.min.js') }}"></script> <!-- 3.4.1 -->
     <script src="{{ url_for('static', filename='jquery.flexdatalist.min.js') }}"></script> <!-- 2.2.4 -->
     <script src="{{ url_for('static', filename='index.js') }}"></script>
+    <script type="text/javascript">
+        $(document).ready(init);
+    </script>
     <style>
         div, span, button {
             font-size: 1.5rem;
@@ -19,8 +22,9 @@
 <form method="get" id="thisform">
     <div class="ui form">
         <select id="search-box" class="ui dropdown" onchange="MyOption()">
-            <option value="items" selected>פריטים</option>
+            <option value="items" selected="selected" >פריטים</option>
             <option value="mkt">מקט</option>
+            <option value="tahbura" {% if thbrstuff %} selected="selected" {% endif %}>משרד התחבורה</option>
         </select>
     </div>
 </form>
@@ -96,8 +100,33 @@
         <button type="button" class="ui button" onclick="resetBtn()">אפס</button>
     </div>
 </form>
+<form method="post" id="thbrform" action="search_tahbura">
+        <div class="ui form">
+        <div class="ui">
+            <label for="thbrInput">חיפוש</label>
+            <i class="search icon"></i>
+            <input type="text" placeholder="מחפש..." style="direction: rtl;" id="thbrInput" name="thbrInput" multiple='multiple'/>
+        </div>
+        {% if thbrstuff %}
+            {% set items = thbrstuff.split('|') %}
+            <div class="ui field">
+            <label>תוצאות חיפוש</label>
+            <div class="ui segments">
+                {% for item in items %}
+                    <div class="ui segment">
+                        {{ item|safe }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        </div>
+        <button type="button" class="ui button" id="thburaBtn" onclick="submitThbr()">שלח</button>
+        <button type="button" class="ui button" onclick="resetBtn()">אפס</button>
+    </div>
+</form>
 <script type="text/javascript">
     $("#mktform").hide();
+    $("#thbrform").hide();
 </script>
 </body>
 </html>

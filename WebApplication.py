@@ -139,6 +139,17 @@ def search_mkt():
     return redirect(url_for('index'), code=302)
 
 
+@app.route('/search_tahbura', methods=['POST'])
+def search_tahbura():
+    try:
+        text = request.form['thbrInput'].strip()
+        results = search_thbr(text)
+        results = "|".join(results)
+        return redirect(url_for('index', thbrstuff=results), code=307)
+    except:
+        return redirect(url_for('index'), code=302)
+
+
 @login_manager.user_loader
 def load_user(user_id):
     from Users import Users
