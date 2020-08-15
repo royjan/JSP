@@ -60,6 +60,8 @@ def index():
     license_plates = CarMapper.get_all_cars_plate()
     if request.method == "GET":
         return render_template('index.html', parts=all_options, vins=vins, license_plates=license_plates)
+    if 'thbrstuff' in request.args:
+        return render_template('index.html', thbrstuff=request.args['thbrstuff'])
     return render_template('index.html', **request.args, parts=all_options, vins=vins, license_plates=license_plates)
 
 
@@ -141,13 +143,13 @@ def search_mkt():
 
 @app.route('/search_tahbura', methods=['POST'])
 def search_tahbura():
-    try:
-        text = request.form['thbrInput'].strip()
-        results = search_thbr(text)
-        results = "|".join(results)
-        return redirect(url_for('index', thbrstuff=results), code=307)
-    except:
-        return redirect(url_for('index'), code=302)
+    # try:
+    text = request.form['thbrInput'].strip()
+    results = search_thbr(text)
+    results = "|".join(results)
+    return redirect(url_for('index', thbrstuff=results), code=307)
+    # except:
+    #     return redirect(url_for('index'), code=302)
 
 
 @login_manager.user_loader
@@ -169,4 +171,4 @@ def add_car():
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0")
+    app.run()

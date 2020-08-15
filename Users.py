@@ -43,7 +43,11 @@ class Users(UserMixin, Base):
 
     @classmethod
     def get_user_by_id(cls, user_id):
-        return cls.db_session.query(Users).filter(Users.id == user_id).first()
+        try:
+            return cls.db_session.query(Users).filter(Users.id == user_id).first()
+        except:
+            cls.db_session.rollback()
+            return cls.db_session.query(Users).filter(Users.id == user_id).first()
 
 
 if __name__ == '__main__':
