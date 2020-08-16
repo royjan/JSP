@@ -1,3 +1,5 @@
+from typing import Iterable
+
 from dictalchemy import make_class_dictable
 from sqlalchemy import Column, String
 from sqlalchemy.exc import IntegrityError
@@ -34,9 +36,9 @@ class Part(Base):
         return self.__dict__
 
     @classmethod
-    def get_part_by_name(cls, name: str) -> list:
+    def get_part_by_name(cls, part_names: Iterable) -> list:
         parts = []
-        for part_name in name.split(","):
+        for part_name in part_names:
             part = cls.db_session.query(cls).filter(cls.name == part_name).first()
             part.bsquare = 'Parts'
             parts.append(part)

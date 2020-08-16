@@ -1,12 +1,13 @@
+import os
+
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory, send_file
 from flask_login import LoginManager, login_user, login_required, current_user
+from selenium.common.exceptions import WebDriverException
 
+from Helper import *
 from Kits import Kits
 from Users import Users
 from main import *
-from selenium.common.exceptions import WebDriverException
-import os
-from Helper import *
 
 
 def setup_login_manager(app):
@@ -78,7 +79,7 @@ def get_parts_by_kit():
     from json import dumps
     kit: Kits = Kits.get_parts_by_kit(request.args['name'])
     result = {"parts": kit.get_parts}
-    return dumps(result, ensure_ascii=False)
+    return dumps(result, ensure_ascii=False).encode('utf8')
 
 
 @app.route(f"/{IMAGES_FOLDER}/<folder>/<path>")
@@ -119,18 +120,13 @@ def log_search_mkt(mkt):
 
 @app.route('/search_part', methods=['POST'])
 def search_part():
-    try:
-        vin = request.form['vin'].upper().strip()
-        license_plate = request.form['license_plate'].strip()
-        part_name = request.form['part_name']
-        log_search_part(part_name, vin, license_plate)
-        current_driver = return_current_driver()
-        part_numbers, license_plate, vin = main_flow(current_driver, vin, license_plate, part_name)
-        return redirect(
-            url_for('index', vin=vin, license_plate=license_plate, part_numbers=part_numbers),
-            code=307)  # 307 = post
-    except:
-        return redirect(url_for('index'), code=302)
+    vin = request.json.get('vin', '').upper().strip()
+    license_plate = request.json.get('license_plate', '').strip()
+    part_name = request.json['part_name']
+    # log_search_part(part_name, vin, license_plate)
+    current_driver = return_current_driver()
+    result = main_flow(current_driver, vin, license_plate, part_name)
+    return json.dumps(result, ensure_ascii=False).encode('utf8')
 
 
 @app.route('/search_mkt', methods=['POST'])
@@ -143,13 +139,9 @@ def search_mkt():
 
 @app.route('/search_tahbura', methods=['POST'])
 def search_tahbura():
-    # try:
-    text = request.form['thbrInput'].strip()
+    text = request.json['thbrInput'].strip()
     results = search_thbr(text)
-    results = "|".join(results)
-    return redirect(url_for('index', thbrstuff=results), code=307)
-    # except:
-    #     return redirect(url_for('index'), code=302)
+    return results
 
 
 @login_manager.user_loader
@@ -161,8 +153,8 @@ def load_user(user_id):
 @app.route('/add_car', methods=['POST'])
 def add_car():
     try:
-        vin = request.form['vin'].upper().strip()
-        license_plate = request.form['license_plate'].strip()
+        vin = request.json['vin'].upper().strip()
+        license_plate = request.json['license_plate'].strip()
         add_car_to_db(vin, license_plate)
         return redirect(
             url_for('index', vin=vin, license_plate=license_plate), code=302)  # 302 = post

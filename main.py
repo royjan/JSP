@@ -5,8 +5,8 @@ import requests
 from CarMapper import CarMapper
 from Helper import retries
 from Part import Part
-from WebUser import WebUser
 from WebDriver import Driver
+from WebUser import WebUser
 
 mapping_english_hebrew = {"misgeret": "מס שלדה",
                           "kinuy_mishari": "כינוי מסחרי",
@@ -23,9 +23,9 @@ def init_driver():
     return web_driver
 
 
-def main_flow(web_driver, vin: str = '', license_plate='', text='גריל מגן'):
+def main_flow(web_driver, vin: str = '', license_plate='', lst_parts=('גריל מגן')):
     my_car = add_car_to_db(vin, license_plate)
-    parts = Part.get_part_by_name(text)
+    parts = Part.get_part_by_name(lst_parts)
     return web_driver.show_popup_with_explanation(parts, my_car)
 
 
@@ -46,19 +46,12 @@ def search(text: str):
 
 
 def store_results(parser_response: dict):
-    lst = []
-    for record in parser_response['records']:
-        lst.append({mapping_english_hebrew[k]: v for k, v in record.items() if k in mapping_english_hebrew})
+    lst = [{mapping_english_hebrew[k]: v for k, v in record.items() if k in mapping_english_hebrew} for record in
+           parser_response['records']]
     return lst
 
 
 def search_thbr(text: str):
     results = search(text)
     records = store_results(results)
-    string = ""
-    lst = []
-    for index, record in enumerate(records, start=1):
-        build_string = f"{index}) "
-        build_string += ", ".join(f"{k}:{v}" for k, v in record.items())
-        lst.append(build_string)
-    return lst
+    return json.dumps(records, ensure_ascii=False).encode('utf8')

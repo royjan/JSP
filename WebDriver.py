@@ -1,10 +1,11 @@
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver import Chrome
+
+from CarMapper import CarMapper
 from Helper import *
 from Part import Part
 from PartMapper import PartMapper
 from WebUser import WebUser
-from CarMapper import CarMapper
 
 
 def singleton(class_):
@@ -16,9 +17,6 @@ def singleton(class_):
         return instances[class_]
 
     return get_instance
-
-
-
 
 
 class Driver:
@@ -65,8 +63,10 @@ class Driver:
             return "לא נמצא מספר שלדה", car.license_plate, car.vin
         CarMapper.name_car_by_vin(car, car_name)
         parts_sorted = Part.sort_parts_by_sections(parts)
-        string_to_web = self.over_every_parts(parts_sorted, car_name)
-        return string_to_web, car.license_plate, car.vin
+        result = self.over_every_parts(parts_sorted, car_name)
+        result['license_plate'] = car.license_plate
+        result['vin'] = car.vin
+        return result
 
     def take_screen_shot(self, part_mapper: PartMapper):
         try:
@@ -170,8 +170,7 @@ class Driver:
 
     def over_every_parts(self, sorted_parts, car_name):
         part_mapper = None
-        part_maps = {}
-        parts_images = []
+        part_maps = {'parts': []}
         for key in sorted_parts.keys():  # key = entire section
             self.close_other_windows()
             try:
@@ -188,14 +187,12 @@ class Driver:
                         image_path = self.take_screen_shot(part_mapper)
                     else:
                         image_path = ""
-                    part_maps[part.name] = part_number
-                    parts_images.append(image_path)
+                    obj = {'name': part.name, 'serial_number': part_number, 'image': image_path}
+                    part_maps['parts'].append(obj)
             except Exception as ex:
                 logger.exception(str(ex))
                 logger.exception(f"Can't find these parts by sections")
-        string_to_web = self.build_string_from_dict(part_maps, parts_images)
-        string_to_web = f"<b>סוג רכב</b> : {car_name}|" + string_to_web
-        return string_to_web
+        return part_maps
 
     @staticmethod
     def left_and_right_scenario(part, items):
@@ -228,8 +225,8 @@ class Driver:
         lines = [line.strip().upper() for line in part.line.split('|')]
         for line in lines:
             item = self._driver.find_elements_by_xpath(
-            f'/html/body/div[4]/div[3]/div[3]/table/tbody/tr[3]/td/div[3]/div[2]/table/tbody//td[contains(text(), '
-            f'"{line}")]')
+                f'/html/body/div[4]/div[3]/div[3]/table/tbody/tr[3]/td/div[3]/div[2]/table/tbody//td[contains(text(), '
+                f'"{line}")]')
             if item:
                 item[0].click()  # white background links with brown titles
                 return
@@ -238,7 +235,7 @@ class Driver:
         categories = [category.strip().upper() for category in part.cat.split('|')]
         for category in categories:
             item = self._driver.find_elements_by_xpath(
-            f'//*[@id="global"]/div[2]/ul//a[text()="{capitalize(category)}"]')
+                f'//*[@id="global"]/div[2]/ul//a[text()="{capitalize(category)}"]')
             if item:
                 item[0].click()  # white background links with brown titles
                 return
@@ -252,6 +249,3 @@ class Driver:
         #         item[0].click()  # white background links with brown titles
         #         return
         self._driver.find_element_by_xpath(f'//*[@id="divTabDoc"]//li/a[contains(text(),"Parts")]').click()
-
-
-
