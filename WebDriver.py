@@ -61,7 +61,7 @@ class Driver:
         if not car_name:
             logger.exception(f"vin not found: {car.vin}")
             return "לא נמצא מספר שלדה", car.license_plate, car.vin
-        CarMapper.name_car_by_vin(car, car_name)
+        CarMapper.update_name_car_by_vin(car, car_name)
         parts_sorted = Part.sort_parts_by_sections(parts)
         result = self.over_every_parts(parts_sorted, car_name)
         result['license_plate'] = car.license_plate
@@ -110,14 +110,6 @@ class Driver:
         part_number = clean_part_number(part_number)
         add_to_clipboard(part_number)
         return part_number
-
-    def search_item_number(self, text: str, vin: str = 'cj500444'):
-        self.close_other_windows()
-        self.home_page()
-        self.search_vin(vin)
-        self._driver.find_element_by_xpath('//*[@id="requete"]').send_keys(text)
-        self._driver.find_element_by_xpath('//*[@id="recherche"]').click()
-        self._driver.find_element_by_xpath('//*[@id="cadre"]/font/a').click()
 
     def search_vin(self, vin: str = ''):
         self.close_other_windows()

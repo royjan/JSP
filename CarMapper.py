@@ -1,9 +1,11 @@
 from dictalchemy import make_class_dictable
+from flask_login import current_user
 from sqlalchemy import Column, String
 from sqlalchemy.ext.declarative import declarative_base
+
 from DataBaseSession import DataBaseSession
 from Log import logger
-from flask_login import current_user
+
 
 Base = declarative_base()
 make_class_dictable(Base)
@@ -50,7 +52,8 @@ class CarMapper(Base):
             db_car = CarMapper.get_car_by_license_plate(self.license_plate)
             if db_car:
                 self.vin = db_car.vin  # if exists -> update object
-                return
+            else:
+                self.vin = self.get_vin_by_api(self.license_plate)
         if db_car:  # if exists but the same
             if self == db_car:
                 return
@@ -59,6 +62,15 @@ class CarMapper(Base):
                     CarMapper.update_car_by_license_plate(self)
         else:
             CarMapper.add_if_needed(self)  # a new one
+
+    @staticmethod
+    def get_vin_by_api(license_plate: str):
+        from main import search_thbr
+        import json
+        result = search_thbr(license_plate)
+        result = json.loads(result)
+        result = result[0]['מס שלדה']
+        return result
 
     @classmethod
     def get_car_by_vin(cls, vin: str):
@@ -69,7 +81,7 @@ class CarMapper(Base):
         return cls.db_session.query(cls).filter(cls.license_plate == license_plate).first()
 
     @classmethod
-    def name_car_by_vin(cls, obj, name: str):
+    def update_name_car_by_vin(cls, obj, name: str):
         cls.db_session.query(cls).filter(cls.vin == obj.vin).update({cls.car_name: name})
         cls.db_session.commit()
 
@@ -90,15 +102,6 @@ class CarMapper(Base):
         result = cls.get_car_by_vin(obj.vin)
         if not result:
             cls.add_car(obj)
-
-    def check_same_license_plate(self, db_obj) -> bool:
-        return self.license_plate == db_obj.license_plate
-
-    def check_same_vin(self, db_obj) -> bool:
-        return self.vin == db_obj.vin
-
-    def check_same_car(self, db_car):
-        return self.check_same_license_plate(db_car) and self.check_same_vin(db_car)
 
 
 if __name__ == '__main__':

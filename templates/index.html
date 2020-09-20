@@ -23,12 +23,11 @@
     <div class="ui form">
         <select id="search-box" class="ui dropdown" onchange="MyOption()">
             <option value="items" selected="selected" >פריטים</option>
-            <option value="mkt">מקט</option>
             <option value="tahbura" {% if thbrstuff %} selected="selected" {% endif %}>משרד התחבורה</option>
         </select>
     </div>
 </form>
-<form method="post" id="itemsform" action="search_part">
+<form method="post" id="itemsform" action="search_part_api">
     <div class="ui form">
         <div class="ui">
             <label for="part_name">שם הפריט\קיט</label>
@@ -87,17 +86,6 @@
         </div>
         <button type="button" class="ui button" id="myBtn" onclick="submitItems()">שלח</button>
         <button type="button"  class="ui button" onclick="resetBtn()" formaction="/">אפס</button>
-    </div>
-</form>
-<form method="post" id="mktform" action="search_mkt">
-    <div class="ui form">
-        <div class="ui">
-            <label for="mkt">מקט</label>
-            <i class="search icon"></i>
-            <input type="text" placeholder="מחפש..." style="direction: rtl;" id="mkt" name="mkt" multiple='multiple'/>
-        </div>
-        <button type="button" class="ui button" id="mktBtn" onclick="submitMkt()">שלח</button>
-        <button type="button" class="ui button" onclick="resetBtn()">אפס</button>
     </div>
 </form>
 <form method="post" id="thbrform" action="search_tahbura">

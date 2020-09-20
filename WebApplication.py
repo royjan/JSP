@@ -1,4 +1,5 @@
 import os
+from typing import Iterable
 
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory, send_file
 from flask_login import LoginManager, login_user, login_required, current_user
@@ -36,9 +37,10 @@ def logout():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
+    payload = parsing_payload(request)
     if request.method == 'POST':
-        user_name = request.form['username']
-        password = request.form['password']
+        user_name = payload['username']
+        password = payload['password']
         user_obj = Users.get_user(user_name)
         if user_obj:
             if user_obj.is_verify(password):
@@ -114,32 +116,36 @@ def log_search_part(part_name, vin, license_plate):
     logger.info(body)
 
 
-def log_search_mkt(mkt):
-    logger.info(f"User: {current_user.user_name} is looking for {mkt}")
-
-
-@app.route('/search_part', methods=['POST'])
-def search_part():
-    vin = request.json.get('vin', '').upper().strip()
-    license_plate = request.json.get('license_plate', '').strip()
-    part_name = request.json['part_name']
+@app.route('/search_part_api', methods=['POST'])
+def search_part_api():
+    """
+    payload = {"part_name" : [str], "vin": str, "license_plate": str}
+    output = {"parts": [{"name": str, "serial_number": str, "image": str}, ...], "license_plate": str, "vin": str}
+    """
+    payload = parsing_payload(request)
+    vin = payload.get('vin', '').upper().strip()
+    license_plate = payload.get('license_plate', '').strip()
+    part_name = get_parts_list(payload['part_name'])
     # log_search_part(part_name, vin, license_plate)
     current_driver = return_current_driver()
-    result = main_flow(current_driver, vin, license_plate, part_name)
+    result = search_parts(current_driver, vin, license_plate, part_name)
     return json.dumps(result, ensure_ascii=False).encode('utf8')
 
 
-@app.route('/search_mkt', methods=['POST'])
-def search_mkt():
-    name = request.form['mkt'].strip()
-    log_search_mkt(name)
-    search_item(driver, name)
-    return redirect(url_for('index'), code=302)
+def get_parts_list(var: Iterable):
+    if type(var) is str:
+        return [var]
+    return var
 
 
 @app.route('/search_tahbura', methods=['POST'])
 def search_tahbura():
-    text = request.json['thbrInput'].strip()
+    """
+    payload = {"thbrInput": str}
+    output = [{"תוצרת": str, "שנת ייצור": number, "מס שלדה": str, "כינוי מסחרי": str}]
+    """
+    payload = parsing_payload(request)
+    text = payload['thbrInput'].strip()
     results = search_thbr(text)
     return results
 
@@ -152,14 +158,19 @@ def load_user(user_id):
 
 @app.route('/add_car', methods=['POST'])
 def add_car():
+    payload = parsing_payload(request)
     try:
-        vin = request.json['vin'].upper().strip()
-        license_plate = request.json['license_plate'].strip()
+        vin = payload['vin'].upper().strip()
+        license_plate = payload['license_plate'].strip()
         add_car_to_db(vin, license_plate)
         return redirect(
             url_for('index', vin=vin, license_plate=license_plate), code=302)  # 302 = post
     except:
         return redirect(url_for('index'), code=302)
+
+
+def parsing_payload(_request):
+    return dict(_request.json or _request.form or _request.args)
 
 
 if __name__ == '__main__':

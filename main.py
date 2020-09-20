@@ -23,7 +23,7 @@ def init_driver():
     return web_driver
 
 
-def main_flow(web_driver, vin: str = '', license_plate='', lst_parts=('גריל מגן')):
+def search_parts(web_driver, vin: str = '', license_plate='', lst_parts=('גריל מגן')):
     my_car = add_car_to_db(vin, license_plate)
     parts = Part.get_part_by_name(lst_parts)
     return web_driver.show_popup_with_explanation(parts, my_car)
@@ -33,10 +33,6 @@ def add_car_to_db(vin: str = '', license_plate=''):
     my_car: CarMapper = CarMapper(vin, license_plate)
     my_car.add_to_db_result()
     return my_car
-
-
-def search_item(web_driver, text):
-    web_driver.search_item_number(text)
 
 
 def search(text: str):
