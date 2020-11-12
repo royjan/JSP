@@ -34,6 +34,12 @@ def logout():
     return redirect('/')
 
 
+@app.route('/get_items', methods=['GET'])
+def get_items():
+    parts = Part.get_part_names()
+    return {"parts": list(parts)}
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
